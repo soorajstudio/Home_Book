@@ -59,7 +59,7 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen>
       );
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to create family: $e';
+        _errorMessage = 'Failed to create family. Please try again.';
         _loading = false;
       });
     }
@@ -103,46 +103,45 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        title: const Text('Household Setup'),
+        title: const Text('Household setup'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign Out',
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Sign out',
             onPressed: _signOut,
           ),
         ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 12),
-              // Header Illustration/Icon
+              const SizedBox(height: 8),
               Center(
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  width: 76,
+                  height: 76,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
+                    gradient: AppTheme.primaryGradient,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: AppTheme.coralGlow,
                   ),
-                  child: const Icon(
-                    Icons.holiday_village_outlined,
-                    size: 56,
-                    color: AppTheme.primary,
-                  ),
+                  child: const Icon(Icons.holiday_village_rounded,
+                      size: 34, color: Colors.white),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               const Text(
                 'Welcome to Family Finance',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
                   color: AppTheme.textPrimary,
                 ),
               ),
@@ -150,146 +149,136 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen>
               const Text(
                 'Set up your family or join an existing one to get started',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppTheme.textSecondary,
-                ),
+                style: TextStyle(fontSize: 13.5, color: AppTheme.textSecondary),
               ),
               const SizedBox(height: 28),
-
-              // Tab Selector
               Container(
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(14),
+                  color: AppTheme.sand,
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: TabBar(
                   controller: _tabController,
                   indicator: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    color: AppTheme.primary,
+                    color: AppTheme.ink,
                   ),
+                  dividerColor: Colors.transparent,
                   labelColor: Colors.white,
                   unselectedLabelColor: AppTheme.textSecondary,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
                   tabs: const [
-                    Tab(text: 'Create Family'),
-                    Tab(text: 'Join Family'),
+                    Tab(text: 'Create family'),
+                    Tab(text: 'Join family'),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Error banner
-              if (_errorMessage != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppTheme.expenseColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AppTheme.expenseColor.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error_outline,
-                          color: AppTheme.expenseColor, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _errorMessage!,
-                          style: const TextStyle(
-                            color: AppTheme.expenseColor,
-                            fontSize: 13,
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                child: _errorMessage != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: Container(
+                          padding: const EdgeInsets.all(13),
+                          decoration: BoxDecoration(
+                            color: AppTheme.roseSoft,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.error_outline_rounded,
+                                  color: AppTheme.rose, size: 18),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _errorMessage!,
+                                  style: const TextStyle(
+                                      color: AppTheme.coralDeep,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // Tab Content Area
+                      )
+                    : const SizedBox.shrink(),
+              ),
               SizedBox(
-                height: 260,
+                height: 250,
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    // Create Family Tab
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const Text(
-                          'Start a new family tracker as the Administrator.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.textSecondary,
-                          ),
+                          'Start a new family tracker as the administrator.',
+                          style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
                         ),
                         const SizedBox(height: 16),
+                        const Text('Family name *', style: AppTheme.eyebrow),
+                        const SizedBox(height: 8),
                         TextField(
                           controller: _createNameCtrl,
                           decoration: const InputDecoration(
-                            labelText: 'Family Name *',
                             hintText: 'e.g. The Sharma Family',
                             prefixIcon: Icon(Icons.home_outlined),
                           ),
                         ),
                         const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: _loading ? null : _handleCreate,
-                          icon: _loading
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(Icons.add_home_outlined),
-                          label: const Text('Create Family & Continue'),
+                        SizedBox(
+                          height: 54,
+                          child: ElevatedButton(
+                            onPressed: _loading ? null : _handleCreate,
+                            child: _loading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white),
+                                  )
+                                : const Text('Create family & continue'),
+                          ),
                         ),
                       ],
                     ),
-
-                    // Join Family Tab
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         const Text(
-                          'Enter the 6-character Invite Code shared by your family admin.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppTheme.textSecondary,
-                          ),
+                          'Enter the invite code shared by your family admin.',
+                          style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
                         ),
                         const SizedBox(height: 16),
+                        const Text('Family invite code *', style: AppTheme.eyebrow),
+                        const SizedBox(height: 8),
                         TextField(
                           controller: _joinCodeCtrl,
                           textCapitalization: TextCapitalization.characters,
                           decoration: const InputDecoration(
-                            labelText: 'Family Invite Code *',
                             hintText: 'e.g. FAM924',
                             prefixIcon: Icon(Icons.vpn_key_outlined),
                           ),
                         ),
                         const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: _loading ? null : _handleJoin,
-                          icon: _loading
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(Icons.group_add_outlined),
-                          label: const Text('Join Family & Continue'),
+                        SizedBox(
+                          height: 54,
+                          child: ElevatedButton(
+                            onPressed: _loading ? null : _handleJoin,
+                            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.teal),
+                            child: _loading
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white),
+                                  )
+                                : const Text('Join family & continue'),
+                          ),
                         ),
                       ],
                     ),

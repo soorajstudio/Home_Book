@@ -11,8 +11,7 @@ class ProfileScreen extends StatefulWidget {
   final bool isAdmin;
   final String familyName;
 
-  const ProfileScreen(
-      {super.key, this.isAdmin = false, this.familyName = ''});
+  const ProfileScreen({super.key, this.isAdmin = false, this.familyName = ''});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -67,13 +66,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'phone': _phoneCtrl.text.trim(),
       }).eq('id', _profile!['id'] as String);
       setState(() {
-        _saveMsg = 'Profile updated!';
+        _saveMsg = 'Profile updated';
         _saveOk = true;
         _saving = false;
       });
     } catch (e) {
       setState(() {
-        _saveMsg = 'Failed to save: $e';
+        _saveMsg = 'Could not save changes. Please try again.';
         _saveOk = false;
         _saving = false;
       });
@@ -86,11 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await Clipboard.setData(ClipboardData(text: code));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Family invite code "$code" copied to clipboard!'),
-          backgroundColor: AppTheme.primary,
-          duration: const Duration(seconds: 2),
-        ),
+        SnackBar(content: Text('Invite code "$code" copied')),
       );
     }
   }
@@ -99,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Leave Family'),
+        title: const Text('Leave family'),
         content: Text(
           'Are you sure you want to leave "${_family?.name ?? 'your family'}"? You can create or join another family anytime.',
         ),
@@ -110,8 +105,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.expenseColor),
-            child: const Text('Leave Family'),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.rose),
+            child: const Text('Leave family'),
           ),
         ],
       ),
@@ -151,215 +146,244 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final familyDisplayName = _family?.name ?? widget.familyName;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Profile')),
+      backgroundColor: AppTheme.cream,
+      appBar: AppBar(title: const Text('Profile')),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2.4)))
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
               child: Column(
                 children: [
-                  // Avatar
-                  CircleAvatar(
-                    radius: 44,
-                    backgroundColor: AppTheme.primary,
-                    child: Text(
-                      initials,
-                      style: const TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                  Container(
+                    width: 88,
+                    height: 88,
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.primaryGradient,
+                      borderRadius: BorderRadius.circular(26),
+                      boxShadow: AppTheme.coralGlow,
+                    ),
+                    child: Center(
+                      child: Text(
+                        initials,
+                        style: const TextStyle(
+                            fontSize: 32, fontWeight: FontWeight.w800, color: Colors.white),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Text('@$username',
                       style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary)),
+                          fontSize: 18, fontWeight: FontWeight.w800, color: AppTheme.textPrimary)),
                   if (isAdmin)
                     Container(
-                      margin: const EdgeInsets.only(top: 6),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 4),
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                       decoration: BoxDecoration(
-                        color: AppTheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
+                        color: AppTheme.coralSoft,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusPill),
                       ),
                       child: const Text('Administrator',
                           style: TextStyle(
-                              color: AppTheme.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12)),
+                              color: AppTheme.coralDeep, fontWeight: FontWeight.w700, fontSize: 11.5)),
                     ),
-                  const SizedBox(height: 20),
-
-                  // Household / Family Card
+                  const SizedBox(height: 24),
                   if (_family != null)
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: AppTheme.card,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                        border: Border.all(color: AppTheme.divider),
+                        boxShadow: AppTheme.softShadow(),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 34,
+                                height: 34,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.sand,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.home_outlined,
+                                    color: AppTheme.textPrimary, size: 17),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  familyDisplayName,
+                                  style: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w800),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.sand,
+                                  borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                                ),
+                                child: Text(
+                                  '${_members.length} member${_members.length == 1 ? '' : 's'}',
+                                  style: const TextStyle(fontSize: 10.5, color: AppTheme.textSecondary, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppTheme.inkGradient.colors.first,
+                              borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+                            ),
+                            child: Row(
                               children: [
-                                const Icon(Icons.home_outlined,
-                                    color: AppTheme.primary, size: 22),
-                                const SizedBox(width: 8),
                                 Expanded(
-                                  child: Text(
-                                    familyDisplayName,
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Family invite code',
+                                          style: TextStyle(
+                                              fontSize: 10.5,
+                                              color: Colors.white.withValues(alpha: 0.5),
+                                              fontWeight: FontWeight.w600)),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        _family!.displayInviteCode,
+                                        style: const TextStyle(
+                                            fontSize: 19,
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: 2,
+                                            color: Colors.white),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    '${_members.length} member${_members.length == 1 ? '' : 's'}',
-                                    style: const TextStyle(
-                                        fontSize: 11,
-                                        color: AppTheme.textSecondary),
+                                Material(
+                                  color: AppTheme.coral,
+                                  borderRadius: BorderRadius.circular(11),
+                                  child: InkWell(
+                                    onTap: _copyInviteCode,
+                                    borderRadius: BorderRadius.circular(11),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.copy_rounded, size: 14, color: Colors.white),
+                                          SizedBox(width: 6),
+                                          Text('Copy',
+                                              style: TextStyle(
+                                                  color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700)),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 14),
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppTheme.primary.withOpacity(0.06),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                    color: AppTheme.primary.withOpacity(0.2)),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Family Invite Code',
-                                          style: TextStyle(
-                                              fontSize: 11,
-                                              color: AppTheme.textSecondary),
-                                        ),
-                                        Text(
-                                          _family!.displayInviteCode,
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 1.5,
-                                              color: AppTheme.primary),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  ElevatedButton.icon(
-                                    onPressed: _copyInviteCode,
-                                    icon: const Icon(Icons.copy, size: 16),
-                                    label: const Text('Copy'),
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 8),
-                                      textStyle: const TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          ),
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: _leaveFamily,
+                              icon: const Icon(Icons.logout_rounded, size: 15, color: AppTheme.rose),
+                              label: const Text('Leave family',
+                                  style: TextStyle(color: AppTheme.rose, fontSize: 12.5, fontWeight: FontWeight.w700)),
+                              style: TextButton.styleFrom(foregroundColor: AppTheme.rose),
                             ),
-                            const SizedBox(height: 12),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton.icon(
-                                onPressed: _leaveFamily,
-                                icon: const Icon(Icons.exit_to_app,
-                                    size: 16, color: AppTheme.expenseColor),
-                                label: const Text('Leave Family',
-                                    style: TextStyle(
-                                        color: AppTheme.expenseColor,
-                                        fontSize: 12)),
-                              ),
-                            ),
-                          ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: AppTheme.card,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+                      border: Border.all(color: AppTheme.divider),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text('Personal details', style: AppTheme.sectionTitle),
+                        const SizedBox(height: 14),
+                        const Text('Full name', style: AppTheme.eyebrow),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _fullNameCtrl,
+                          decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.badge_outlined),
+                          ),
                         ),
-                      ),
-                    ),
-
-                  const SizedBox(height: 16),
-                  // Edit form
-                  TextField(
-                    controller: _fullNameCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Full Name',
-                      prefixIcon: Icon(Icons.badge_outlined),
+                        const SizedBox(height: 14),
+                        const Text('Phone number', style: AppTheme.eyebrow),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _phoneCtrl,
+                          keyboardType: TextInputType.phone,
+                          decoration: const InputDecoration(
+                            prefixIcon: Icon(Icons.phone_outlined),
+                          ),
+                        ),
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 200),
+                          child: _saveMsg != null
+                              ? Padding(
+                                  padding: const EdgeInsets.only(top: 14),
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: (_saveOk ? AppTheme.tealSoft : AppTheme.roseSoft),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(_saveMsg!,
+                                        style: TextStyle(
+                                            color: _saveOk ? AppTheme.teal : AppTheme.coralDeep,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600)),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ),
+                        const SizedBox(height: 18),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: _saving ? null : _save,
+                            child: _saving
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white))
+                                : const Text('Save changes'),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _phoneCtrl,
-                    keyboardType: TextInputType.phone,
-                    decoration: const InputDecoration(
-                      labelText: 'Phone Number',
-                      prefixIcon: Icon(Icons.phone_outlined),
-                    ),
-                  ),
-                  if (_saveMsg != null) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: (_saveOk ? AppTheme.incomeColor : AppTheme.expenseColor)
-                            .withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(_saveMsg!,
-                          style: TextStyle(
-                              color: _saveOk
-                                  ? AppTheme.incomeColor
-                                  : AppTheme.expenseColor)),
-                    ),
-                  ],
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _saving ? null : _save,
-                      icon: _saving
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white))
-                          : const Icon(Icons.save_outlined),
-                      label: const Text('Save Changes'),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
+                    height: 50,
                     child: OutlinedButton.icon(
                       onPressed: _logout,
-                      icon: const Icon(Icons.logout,
-                          color: AppTheme.expenseColor),
-                      label: const Text('Sign Out',
-                          style: TextStyle(color: AppTheme.expenseColor)),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppTheme.expenseColor),
-                      ),
+                      icon: const Icon(Icons.logout_rounded, size: 17, color: AppTheme.rose),
+                      label: const Text('Sign out', style: TextStyle(color: AppTheme.rose)),
+                      style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFF1CFC9))),
                     ),
                   ),
-                  const SizedBox(height: 80),
                 ],
               ),
             ),

@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Home Book',
+      title: 'Family Finance',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
       home: const SplashDecider(),
@@ -94,38 +94,45 @@ class _SplashDeciderState extends State<SplashDecider> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.primary,
+      backgroundColor: AppTheme.ink,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              width: 88,
+              height: 88,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(24),
+                gradient: AppTheme.primaryGradient,
+                borderRadius: BorderRadius.circular(26),
+                boxShadow: AppTheme.coralGlow,
               ),
-              child: const Icon(Icons.account_balance_wallet,
-                  size: 64, color: Colors.white),
+              child: const Icon(Icons.savings_rounded,
+                  size: 42, color: Colors.white),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
             const Text(
-              'Home Book',
+              'Family Finance',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.4,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            const SizedBox(height: 6),
+            Text(
               'Track together, grow together',
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 13.5),
             ),
-            const SizedBox(height: 40),
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Colors.white),
-              strokeWidth: 2,
+            const SizedBox(height: 44),
+            const SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(AppTheme.coral),
+                strokeWidth: 2.4,
+              ),
             ),
           ],
         ),

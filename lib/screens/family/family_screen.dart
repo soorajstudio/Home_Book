@@ -52,9 +52,8 @@ class _FamilyScreenState extends State<FamilyScreen> {
           toDate: to,
           type: 'expense',
         );
-        final total = txns
-            .where((t) => t.userId == m.id)
-            .fold(0.0, (s, t) => s + t.amount);
+        final total =
+            txns.where((t) => t.userId == m.id).fold(0.0, (s, t) => s + t.amount);
         expenses[m.id] = total;
       }
 
@@ -73,30 +72,37 @@ class _FamilyScreenState extends State<FamilyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.familyName),
-      ),
+      backgroundColor: AppTheme.cream,
+      appBar: AppBar(title: Text(widget.familyName)),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2.4)))
           : RefreshIndicator(
               onRefresh: _load,
+              color: AppTheme.coral,
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
                 children: [
-                  // Family header
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(22),
                     decoration: BoxDecoration(
-                      gradient: AppTheme.primaryGradient,
-                      borderRadius: BorderRadius.circular(20),
+                      gradient: AppTheme.inkGradient,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                     ),
                     child: Row(
                       children: [
-                        const CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Colors.white24,
-                          child: Icon(Icons.family_restroom,
-                              color: Colors.white, size: 28),
+                        Container(
+                          width: 54,
+                          height: 54,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Icon(Icons.family_restroom_rounded,
+                              color: Colors.white, size: 26),
                         ),
                         const SizedBox(width: 16),
                         Column(
@@ -106,28 +112,24 @@ class _FamilyScreenState extends State<FamilyScreen> {
                               widget.familyName,
                               style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold),
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.3),
                             ),
+                            const SizedBox(height: 3),
                             Text(
                               '${_members.length} member${_members.length != 1 ? 's' : ''}',
-                              style: const TextStyle(
-                                  color: Colors.white70, fontSize: 13),
+                              style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.55), fontSize: 12.5),
                             ),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Members',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textPrimary),
-                  ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 24),
+                  const Text('Members', style: AppTheme.sectionTitle),
+                  const SizedBox(height: 10),
                   ..._members.map((m) => _MemberCard(
                         member: m,
                         monthExpense: _memberExpense[m.id] ?? 0,
@@ -146,93 +148,88 @@ class _MemberCard extends StatelessWidget {
   final NumberFormat currency;
 
   const _MemberCard(
-      {required this.member,
-      required this.monthExpense,
-      required this.currency});
+      {required this.member, required this.monthExpense, required this.currency});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: member.isAdmin
-                  ? AppTheme.primary.withOpacity(0.15)
-                  : AppTheme.secondary.withOpacity(0.15),
+    final accent = member.isAdmin ? AppTheme.coral : AppTheme.teal;
+    final accentSoft = member.isAdmin ? AppTheme.coralSoft : AppTheme.tealSoft;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.card,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: AppTheme.divider),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: accentSoft,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Center(
               child: Text(
                 member.initials,
                 style: TextStyle(
-                  color: member.isAdmin
-                      ? AppTheme.primary
-                      : AppTheme.secondary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                    color: accent, fontWeight: FontWeight.w800, fontSize: 15),
               ),
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        member.displayName,
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                      if (member.isAdmin) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primary.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'Admin',
-                            style: TextStyle(
-                                fontSize: 10,
-                                color: AppTheme.primary,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  Text(
-                    '@${member.username}',
-                    style: const TextStyle(
-                        color: AppTheme.textSecondary, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'This month',
-                  style: TextStyle(
-                      color: AppTheme.textSecondary, fontSize: 10),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        member.displayName,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5),
+                      ),
+                    ),
+                    if (member.isAdmin) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.coralSoft,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          'Admin',
+                          style: TextStyle(
+                              fontSize: 9.5, color: AppTheme.coralDeep, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
-                Text(
-                  currency.format(monthExpense),
-                  style: const TextStyle(
-                      color: AppTheme.expenseColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14),
-                ),
+                const SizedBox(height: 2),
+                Text('@${member.username}',
+                    style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
               ],
             ),
-          ],
-        ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Text('This month',
+                  style: TextStyle(color: AppTheme.textMuted, fontSize: 10, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 2),
+              Text(
+                currency.format(monthExpense),
+                style: AppTheme.moneySmall.copyWith(color: AppTheme.rose),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

@@ -22,7 +22,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   final _familyService = FamilyService();
   final _txnService = TransactionService();
   final _auth = AuthService();
-  final _currency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+  final _currency =
+      NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
 
   int _totalUsers = 0;
   int _totalTransactions = 0;
@@ -51,10 +52,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       double expense = 0;
 
       if (family != null) {
-        final users = await _supabase
-            .from('profiles')
-            .select('id')
-            .eq('family_id', family.id);
+        final users =
+            await _supabase.from('profiles').select('id').eq('family_id', family.id);
         usersCount = (users as List).length;
 
         final transactions = await _supabase
@@ -90,7 +89,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sign Out'),
+        title: const Text('Sign out'),
         content: const Text('Are you sure you want to sign out?'),
         actions: [
           TextButton(
@@ -99,8 +98,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.expenseColor),
-            child: const Text('Sign Out'),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.rose),
+            child: const Text('Sign out'),
           ),
         ],
       ),
@@ -119,116 +118,94 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.cream,
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        backgroundColor: AppTheme.primaryDark,
+        title: const Text('Admin overview'),
         automaticallyImplyLeading: false,
         actions: [
+          IconButton(icon: const Icon(Icons.refresh_rounded), onPressed: _load),
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _load,
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign Out',
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Sign out',
             onPressed: _signOut,
           ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(strokeWidth: 2.4)))
           : RefreshIndicator(
               onRefresh: _load,
+              color: AppTheme.coral,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Family header
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryDark,
-                        borderRadius: BorderRadius.circular(16),
+                        gradient: AppTheme.inkGradient,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Family',
+                          Text('Family',
                               style: TextStyle(
-                                  color: Colors.white70, fontSize: 12)),
+                                  color: Colors.white.withValues(alpha: 0.5), fontSize: 11.5, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 4),
                           Text(
                             _familyName,
                             style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold),
+                                color: Colors.white, fontSize: 21, fontWeight: FontWeight.w800, letterSpacing: -0.3),
                           ),
                           if (_family != null) ...[
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
+                            const SizedBox(height: 14),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text('Invite code',
+                                      style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12)),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _family!.displayInviteCode,
+                                    style: const TextStyle(
+                                        color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: 1.4),
+                                  ),
+                                  const Spacer(),
+                                  InkWell(
                                     borderRadius: BorderRadius.circular(8),
+                                    onTap: () {
+                                      final code = _family!.displayInviteCode;
+                                      Clipboard.setData(ClipboardData(text: code));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Invite code "$code" copied')),
+                                      );
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(4),
+                                      child: Icon(Icons.copy_rounded, color: Colors.white, size: 16),
+                                    ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Text(
-                                        'Invite Code: ',
-                                        style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 12),
-                                      ),
-                                      Text(
-                                        _family!.displayInviteCode,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                            letterSpacing: 1.2),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  icon: const Icon(Icons.copy,
-                                      color: Colors.white, size: 18),
-                                  tooltip: 'Copy Invite Code',
-                                  visualDensity: VisualDensity.compact,
-                                  onPressed: () {
-                                    final code = _family!.displayInviteCode;
-                                    Clipboard.setData(ClipboardData(text: code));
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Invite code "$code" copied to clipboard!'),
-                                        backgroundColor: AppTheme.primary,
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Overview',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary),
-                    ),
+                    const SizedBox(height: 24),
+                    const Text('Overview', style: AppTheme.sectionTitle),
                     const SizedBox(height: 12),
                     GridView.count(
                       crossAxisCount: 2,
@@ -236,41 +213,47 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
-                      childAspectRatio: 1.4,
+                      childAspectRatio: 1.35,
                       children: [
                         _StatCard(
-                          label: 'Total Users',
+                          label: 'Total users',
                           value: _totalUsers.toString(),
-                          icon: Icons.group_outlined,
-                          color: AppTheme.primary,
+                          icon: Icons.group_rounded,
+                          color: AppTheme.coral,
+                          bg: AppTheme.coralSoft,
                         ),
                         _StatCard(
-                          label: 'Total Transactions',
+                          label: 'Transactions',
                           value: _totalTransactions.toString(),
-                          icon: Icons.receipt_long_outlined,
-                          color: AppTheme.secondary,
+                          icon: Icons.receipt_long_rounded,
+                          color: AppTheme.textPrimary,
+                          bg: AppTheme.sand,
                           onTap: _familyId != null
-                              ? () => Navigator.of(context).push(
+                              ? () => Navigator.of(context)
+                                  .push(
                                     MaterialPageRoute(
                                       builder: (_) => TransactionsScreen(
                                         familyId: _familyId!,
                                         canAdd: false,
                                       ),
                                     ),
-                                  ).then((_) => _load())
+                                  )
+                                  .then((_) => _load())
                               : null,
                         ),
                         _StatCard(
-                          label: 'Month Income',
+                          label: 'Month income',
                           value: _currency.format(_monthIncome),
-                          icon: Icons.trending_up,
-                          color: AppTheme.incomeColor,
+                          icon: Icons.trending_up_rounded,
+                          color: AppTheme.teal,
+                          bg: AppTheme.tealSoft,
                         ),
                         _StatCard(
-                          label: 'Month Expense',
+                          label: 'Month expense',
                           value: _currency.format(_monthExpense),
-                          icon: Icons.trending_down,
-                          color: AppTheme.expenseColor,
+                          icon: Icons.trending_down_rounded,
+                          color: AppTheme.rose,
+                          bg: AppTheme.roseSoft,
                         ),
                       ],
                     ),
@@ -287,6 +270,7 @@ class _StatCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final Color bg;
   final VoidCallback? onTap;
 
   const _StatCard({
@@ -294,20 +278,24 @@ class _StatCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.color,
+    required this.bg,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 1,
+      color: AppTheme.card,
+      borderRadius: BorderRadius.circular(AppTheme.radiusLg),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        child: Container(
           padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+            border: Border.all(color: AppTheme.divider),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -315,10 +303,13 @@ class _StatCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(icon, color: color, size: 28),
+                  Container(
+                    padding: const EdgeInsets.all(9),
+                    decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(11)),
+                    child: Icon(icon, color: color, size: 19),
+                  ),
                   if (onTap != null)
-                    const Icon(Icons.arrow_forward_ios,
-                        size: 12, color: AppTheme.textSecondary),
+                    const Icon(Icons.arrow_forward_ios_rounded, size: 11, color: AppTheme.textMuted),
                 ],
               ),
               Column(
@@ -326,15 +317,12 @@ class _StatCard extends StatelessWidget {
                 children: [
                   Text(
                     value,
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: color),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: color, letterSpacing: -0.3),
                   ),
                   const SizedBox(height: 2),
                   Text(label,
-                      style: const TextStyle(
-                          color: AppTheme.textSecondary, fontSize: 12)),
+                      style: const TextStyle(color: AppTheme.textMuted, fontSize: 12, fontWeight: FontWeight.w600)),
                 ],
               ),
             ],

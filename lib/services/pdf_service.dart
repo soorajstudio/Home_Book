@@ -68,7 +68,7 @@ class PdfService {
           pw.SizedBox(height: 8),
           if (sortedTxns.isEmpty)
             pw.Text('No transactions found for this period.',
-                style: pw.TextStyle(color: PdfColors.grey600))
+                style: const pw.TextStyle(color: PdfColors.grey600))
           else
             _transactionTable(sortedTxns),
         ],

@@ -41,9 +41,9 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
   Widget _buildTransactionsPage() {
     if (_familyId == null) {
       return Scaffold(
+        backgroundColor: AppTheme.cream,
         appBar: AppBar(
           title: const Text('Transactions'),
-          backgroundColor: AppTheme.primaryDark,
           automaticallyImplyLeading: false,
         ),
         body: const Center(
@@ -61,7 +61,11 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: AppTheme.cream,
+        body: Center(
+          child: SizedBox(
+              width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4)),
+        ),
       );
     }
 
@@ -77,28 +81,26 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
         index: _index,
         children: pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _index,
-        onTap: (i) => setState(() => _index = i),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppTheme.accent,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.admin_panel_settings_outlined),
-              activeIcon: Icon(Icons.admin_panel_settings),
-              label: 'Dashboard'),
-          BottomNavigationBarItem(
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _index,
+        onDestinationSelected: (i) => setState(() => _index = i),
+        height: 68,
+        destinations: const [
+          NavigationDestination(
+              icon: Icon(Icons.space_dashboard_outlined),
+              selectedIcon: Icon(Icons.space_dashboard_rounded),
+              label: 'Overview'),
+          NavigationDestination(
               icon: Icon(Icons.receipt_long_outlined),
-              activeIcon: Icon(Icons.receipt_long),
-              label: 'Transactions'),
-          BottomNavigationBarItem(
+              selectedIcon: Icon(Icons.receipt_long_rounded),
+              label: 'Activity'),
+          NavigationDestination(
               icon: Icon(Icons.group_outlined),
-              activeIcon: Icon(Icons.group),
+              selectedIcon: Icon(Icons.group_rounded),
               label: 'Users'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.label_outline),
-              activeIcon: Icon(Icons.label),
+          NavigationDestination(
+              icon: Icon(Icons.label_outline_rounded),
+              selectedIcon: Icon(Icons.label_rounded),
               label: 'Categories'),
         ],
       ),

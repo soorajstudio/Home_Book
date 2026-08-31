@@ -56,7 +56,8 @@ class _ShellScreenState extends State<ShellScreen> {
       ];
     }
     return [
-      DashboardScreen(familyId: _familyId!, familyName: _familyName, isAdmin: widget.isAdmin),
+      DashboardScreen(
+          familyId: _familyId!, familyName: _familyName, isAdmin: widget.isAdmin),
       TransactionsScreen(familyId: _familyId!),
       ReportsScreen(familyId: _familyId!, familyName: _familyName),
       ProfileScreen(isAdmin: widget.isAdmin, familyName: _familyName),
@@ -67,7 +68,14 @@ class _ShellScreenState extends State<ShellScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        backgroundColor: AppTheme.cream,
+        body: Center(
+          child: SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(strokeWidth: 2.4),
+          ),
+        ),
       );
     }
 
@@ -78,28 +86,26 @@ class _ShellScreenState extends State<ShellScreen> {
         index: _currentIndex,
         children: pages,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppTheme.accent,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (i) => setState(() => _currentIndex = i),
+        height: 68,
+        destinations: const [
+          NavigationDestination(
               icon: Icon(Icons.dashboard_outlined),
-              activeIcon: Icon(Icons.dashboard),
-              label: 'Dashboard'),
-          BottomNavigationBarItem(
+              selectedIcon: Icon(Icons.dashboard_rounded),
+              label: 'Home'),
+          NavigationDestination(
               icon: Icon(Icons.receipt_long_outlined),
-              activeIcon: Icon(Icons.receipt_long),
-              label: 'Transactions'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart_outlined),
-              activeIcon: Icon(Icons.bar_chart),
+              selectedIcon: Icon(Icons.receipt_long_rounded),
+              label: 'Activity'),
+          NavigationDestination(
+              icon: Icon(Icons.pie_chart_outline_rounded),
+              selectedIcon: Icon(Icons.pie_chart_rounded),
               label: 'Reports'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
+          NavigationDestination(
+              icon: Icon(Icons.person_outline_rounded),
+              selectedIcon: Icon(Icons.person_rounded),
               label: 'Profile'),
         ],
       ),
@@ -110,8 +116,7 @@ class _ShellScreenState extends State<ShellScreen> {
 class _NoFamilyPage extends StatefulWidget {
   final bool isAdmin;
   final VoidCallback onFamilyCreated;
-  const _NoFamilyPage(
-      {required this.isAdmin, required this.onFamilyCreated});
+  const _NoFamilyPage({required this.isAdmin, required this.onFamilyCreated});
 
   @override
   State<_NoFamilyPage> createState() => _NoFamilyPageState();
@@ -127,19 +132,28 @@ class _NoFamilyPageState extends State<_NoFamilyPage> {
   Future<void> _create() async {
     final name = _createCtrl.text.trim();
     if (name.isEmpty) return;
-    setState(() { _creating = true; _error = null; });
+    setState(() {
+      _creating = true;
+      _error = null;
+    });
     try {
       await FamilyService().createFamily(name);
       widget.onFamilyCreated();
     } catch (e) {
-      setState(() { _error = e.toString(); _creating = false; });
+      setState(() {
+        _error = e.toString();
+        _creating = false;
+      });
     }
   }
 
   Future<void> _join() async {
     final code = _joinCtrl.text.trim();
     if (code.isEmpty) return;
-    setState(() { _joining = true; _error = null; });
+    setState(() {
+      _joining = true;
+      _error = null;
+    });
     try {
       await FamilyService().joinFamilyByCode(code);
       widget.onFamilyCreated();
@@ -154,99 +168,183 @@ class _NoFamilyPageState extends State<_NoFamilyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Family Setup')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.family_restroom, size: 72, color: AppTheme.primary),
-              const SizedBox(height: 20),
-              const Text('Welcome!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              const Text(
-                'Create your own family tracker or enter an invite code to join one.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
-              ),
-              const SizedBox(height: 24),
-              if (_error != null) ...[
-                Text(_error!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: AppTheme.expenseColor, fontSize: 13)),
-                const SizedBox(height: 12),
-              ],
-              // Create Family
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+      backgroundColor: AppTheme.cream,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.primaryGradient,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: AppTheme.coralGlow,
+                  ),
+                  child: const Icon(Icons.family_restroom_rounded,
+                      size: 34, color: Colors.white),
+                ),
+                const SizedBox(height: 22),
+                const Text('Set up your family',
+                    style: TextStyle(
+                        fontSize: 23,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.4,
+                        color: AppTheme.textPrimary)),
+                const SizedBox(height: 8),
+                const Text(
+                  'Start a new tracker or join one with\nan invite code from a family member.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: AppTheme.textSecondary, fontSize: 13.5, height: 1.45),
+                ),
+                const SizedBox(height: 24),
+                if (_error != null) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.roseSoft,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(_error!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: AppTheme.coralDeep,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                // Create Family
+                _SetupCard(
+                  icon: Icons.add_home_rounded,
+                  iconColor: AppTheme.coral,
+                  iconBg: AppTheme.coralSoft,
+                  title: 'Create a new family',
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text('Create a New Family',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                      const SizedBox(height: 10),
                       TextField(
                         controller: _createCtrl,
                         decoration: const InputDecoration(
-                          labelText: 'Family Name',
-                          prefixIcon: Icon(Icons.home_outlined),
+                          labelText: 'Family name',
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        onPressed: _creating ? null : _create,
-                        icon: _creating
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                            : const Icon(Icons.add_home_outlined),
-                        label: const Text('Create Family'),
+                      SizedBox(
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: _creating ? null : _create,
+                          child: _creating
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white))
+                              : const Text('Create family'),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              // Join Family
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+                const SizedBox(height: 14),
+                // Join Family
+                _SetupCard(
+                  icon: Icons.vpn_key_rounded,
+                  iconColor: AppTheme.teal,
+                  iconBg: AppTheme.tealSoft,
+                  title: 'Join with an invite code',
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text('Join with Invite Code',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                      const SizedBox(height: 10),
                       TextField(
                         controller: _joinCtrl,
                         textCapitalization: TextCapitalization.characters,
                         decoration: const InputDecoration(
-                          labelText: 'Invite Code',
+                          labelText: 'Invite code',
                           hintText: 'e.g. FAM924',
-                          prefixIcon: Icon(Icons.vpn_key_outlined),
                         ),
                       ),
                       const SizedBox(height: 12),
-                      OutlinedButton.icon(
-                        onPressed: _joining ? null : _join,
-                        icon: _joining
-                            ? const SizedBox(
-                                width: 16,
-                                height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2))
-                            : const Icon(Icons.group_add_outlined),
-                        label: const Text('Join Family'),
+                      SizedBox(
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: _joining ? null : _join,
+                          child: _joining
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2))
+                              : const Text('Join family'),
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SetupCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final Color iconBg;
+  final String title;
+  final Widget child;
+
+  const _SetupCard({
+    required this.icon,
+    required this.iconColor,
+    required this.iconBg,
+    required this.title,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppTheme.card,
+        borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+        border: Border.all(color: AppTheme.divider),
+        boxShadow: AppTheme.softShadow(),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: iconColor, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Text(title,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14.5,
+                      color: AppTheme.textPrimary)),
+            ],
+          ),
+          const SizedBox(height: 14),
+          child,
+        ],
       ),
     );
   }

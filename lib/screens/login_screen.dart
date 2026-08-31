@@ -31,7 +31,10 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() { loading = true; errorMessage = null; });
+    setState(() {
+      loading = true;
+      errorMessage = null;
+    });
 
     try {
       await authService.login(username, password);
@@ -61,14 +64,19 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       final msg = e.toString().toLowerCase();
       String friendly;
-      if (msg.contains('invalid') || msg.contains('credentials') || msg.contains('password')) {
+      if (msg.contains('invalid') ||
+          msg.contains('credentials') ||
+          msg.contains('password')) {
         friendly = 'Invalid username or password';
       } else if (msg.contains('network') || msg.contains('socket')) {
         friendly = 'Network error — please check your connection';
       } else {
         friendly = 'Login failed. Please try again.';
       }
-      setState(() { errorMessage = friendly; loading = false; });
+      setState(() {
+        errorMessage = friendly;
+        loading = false;
+      });
     }
   }
 
@@ -82,153 +90,210 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: AppTheme.ink,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
-                decoration: const BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(32),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.account_balance_wallet,
-                          size: 48, color: Colors.white),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Family Finance',
-                      style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Track together, grow together',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-              // Form
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Welcome Back',
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text('Sign in to your account',
-                        style: TextStyle(color: AppTheme.textSecondary)),
-                    const SizedBox(height: 24),
-                    TextField(
-                      controller: usernameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Username',
-                        prefixIcon: Icon(Icons.person_outline),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: passwordController,
-                      obscureText: obscurePassword,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(obscurePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility),
-                          onPressed: () => setState(
-                              () => obscurePassword = !obscurePassword),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (errorMessage != null)
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.only(top: 8),
-                        decoration: BoxDecoration(
-                          color: AppTheme.expenseColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                              color: AppTheme.expenseColor.withOpacity(0.3)),
-                        ),
-                        child: Row(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
+                    children: [
+                      // Hero
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(28, 36, 28, 28),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.error_outline,
-                                color: AppTheme.expenseColor, size: 18),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(errorMessage!,
-                                  style: const TextStyle(
-                                      color: AppTheme.expenseColor,
-                                      fontSize: 13)),
+                            Container(
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                gradient: AppTheme.primaryGradient,
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: AppTheme.coralGlow,
+                              ),
+                              child: const Icon(Icons.savings_rounded,
+                                  color: Colors.white, size: 28),
+                            ),
+                            const SizedBox(height: 28),
+                            const Text(
+                              'Welcome back',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.6,
+                                height: 1.1,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Sign in to keep your family\'s money\non the same page.',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.55),
+                                fontSize: 14.5,
+                                height: 1.4,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: loading ? null : handleLogin,
-                        child: loading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: Colors.white))
-                            : const Text('Sign In'),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account? ",
-                            style: TextStyle(color: AppTheme.textSecondary)),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (_) => const RegisterScreen()),
+                      // Form sheet
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            color: AppTheme.cream,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(32),
+                              topRight: Radius.circular(32),
+                            ),
                           ),
-                          child: const Text('Register',
-                              style: TextStyle(
-                                  color: AppTheme.primary,
-                                  fontWeight: FontWeight.bold)),
+                          padding: const EdgeInsets.fromLTRB(28, 36, 28, 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const Text('Username', style: AppTheme.eyebrow),
+                              const SizedBox(height: 8),
+                              TextField(
+                                controller: usernameController,
+                                textInputAction: TextInputAction.next,
+                                decoration: const InputDecoration(
+                                  hintText: 'Enter your username',
+                                  prefixIcon:
+                                      Icon(Icons.person_outline_rounded),
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              const Text('Password', style: AppTheme.eyebrow),
+                              const SizedBox(height: 8),
+                              TextField(
+                                controller: passwordController,
+                                obscureText: obscurePassword,
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) => handleLogin(),
+                                decoration: InputDecoration(
+                                  hintText: 'Enter your password',
+                                  prefixIcon:
+                                      const Icon(Icons.lock_outline_rounded),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      obscurePassword
+                                          ? Icons.visibility_off_rounded
+                                          : Icons.visibility_rounded,
+                                      color: AppTheme.textMuted,
+                                      size: 20,
+                                    ),
+                                    onPressed: () => setState(
+                                        () => obscurePassword = !obscurePassword),
+                                  ),
+                                ),
+                              ),
+                              AnimatedSize(
+                                duration: const Duration(milliseconds: 200),
+                                child: errorMessage != null
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(top: 14),
+                                        child: _ErrorBanner(text: errorMessage!),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                              const SizedBox(height: 26),
+                              SizedBox(
+                                height: 54,
+                                child: ElevatedButton(
+                                  onPressed: loading ? null : handleLogin,
+                                  child: loading
+                                      ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2.4,
+                                              color: Colors.white),
+                                        )
+                                      : const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text('Sign in'),
+                                            SizedBox(width: 8),
+                                            Icon(Icons.arrow_forward_rounded,
+                                                size: 18),
+                                          ],
+                                        ),
+                                ),
+                              ),
+                              const Spacer(),
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 24),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text("New here? ",
+                                          style: TextStyle(
+                                              color: AppTheme.textSecondary,
+                                              fontSize: 14)),
+                                      GestureDetector(
+                                        onTap: () => Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (_) =>
+                                                  const RegisterScreen()),
+                                        ),
+                                        child: const Text('Create an account',
+                                            style: TextStyle(
+                                                color: AppTheme.coralDeep,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 14)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
+      ),
+    );
+  }
+}
+
+class _ErrorBanner extends StatelessWidget {
+  final String text;
+  const _ErrorBanner({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: AppTheme.roseSoft,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline_rounded,
+              color: AppTheme.rose, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(text,
+                style: const TextStyle(
+                    color: AppTheme.coralDeep,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600)),
+          ),
+        ],
       ),
     );
   }
